@@ -4,3 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+axum = "0.7.9"
+cargo-watch = "8.5.3"
+tokio = {version="1.42.0", features = ["full"]}
+watch = "0.2.3"
+
+[dev-dependencies]
+anyhow = "1"
+httpc-test = "0.1.1"
