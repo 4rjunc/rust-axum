@@ -1,17 +1,25 @@
 use axum::{
-    extract::{Path, Query}, response::{Html, IntoResponse}, routing::get, Router
+    extract::{Path, Query}, response::{Html, IntoResponse}, routing::{get, get_service}, Router,
+    http::{StatusCode, Uri},
 };
 use serde::Deserialize;
+use tower_http::services::ServeDir;
 
 #[tokio::main]
 async fn main() {
     // build our application with a single route
-    let app = Router::new().merge(routes_hello()) ;
+    let app = Router::new()
+        .merge(routes_hello())
+        .fallback(fallback);
     // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     println!("->> LISTENING http://0.0.0.0:3000 \n");
     axum::serve(listener, app).await.unwrap();
 }
+
+// fn route_static() -> Router{
+//     Router::new().nest_service("/", get_service(ServeDir::new("./")))
+// }
 
 //Routes Hello
 fn routes_hello() -> Router{
@@ -37,5 +45,10 @@ async fn handler_hello(Query(params): Query<HelloParams>) -> impl IntoResponse{
 async fn handler_hello2(Path(name): Path<String>) -> impl IntoResponse{
     println!("->> {:<12} - handler_hello2 - {name:?}","HANDLER");
     Html(format!("Hello, <strong>{name}</strong>"))
+}
 
+//fallback
+async fn fallback(uri: Uri) -> impl IntoResponse {
+    println!("->> {:<12} - fallback","FALLBACK");
+    (StatusCode::NOT_FOUND, format!("You are lost!, No route for {uri}"))
 }

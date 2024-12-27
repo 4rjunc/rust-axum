@@ -1,7 +1,7 @@
 # How to start server?
 
 ```
-cargo watch -q -c -w src/ run
+cargo watch -q -c -w src/ -x run
 ```
 
 # How to start client side?
