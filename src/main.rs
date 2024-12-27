@@ -1,6 +1,5 @@
 use axum::{
-    extract::{Path, Query}, response::{Html, IntoResponse}, routing::{get, get_service}, Router,
-    http::{StatusCode, Uri},
+    extract::{Path, Query}, http::{StatusCode, Uri}, middleware, response::{Html, IntoResponse, Response}, routing::{get, get_service}, Router
 };
 use serde::Deserialize;
 // use tower_http::services::ServeDir;
@@ -15,6 +14,7 @@ async fn main() {
     let app = Router::new()
         .merge(routes_hello())
         .merge(web::routes_login::routes())
+        .layer(middleware::map_response(main_response_mapper))
         .fallback(fallback);
     // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
@@ -25,6 +25,13 @@ async fn main() {
 // fn route_static() -> Router{
 //     Router::new().nest_service("/", get_service(ServeDir::new("./")))
 // }
+
+async fn main_response_mapper(res: Response) -> Response {
+    println!("->> {:<12} - main_response_mapper", "RES_MAPPER");
+
+    println!();
+    res
+}
 
 //Routes Hello
 fn routes_hello() -> Router{
