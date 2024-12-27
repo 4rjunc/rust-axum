@@ -3,13 +3,18 @@ use axum::{
     http::{StatusCode, Uri},
 };
 use serde::Deserialize;
-use tower_http::services::ServeDir;
+// use tower_http::services::ServeDir;
+pub use self::error::{Error, Result};
+//error handling
+mod error;
+mod web;
 
 #[tokio::main]
 async fn main() {
     // build our application with a single route
     let app = Router::new()
         .merge(routes_hello())
+        .merge(web::routes_login::routes())
         .fallback(fallback);
     // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
